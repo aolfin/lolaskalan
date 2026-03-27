@@ -502,16 +502,41 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!dropdown) {
             dropdown = document.createElement('div');
             dropdown.className = 'cart-dropdown';
-            cartIcon.appendChild(dropdown);
+            document.body.appendChild(dropdown);
+            positionCartDropdown(dropdown);
         }
 
         if (dropdown.classList.contains('active')) {
             dropdown.classList.remove('active');
         } else {
             updateCartDropdown();
+            positionCartDropdown(dropdown);
             dropdown.classList.add('active');
         }
     }
+
+    function positionCartDropdown(dropdown) {
+        const rect = cartIcon.getBoundingClientRect();
+        dropdown.style.position = 'fixed';
+        dropdown.style.top = (rect.bottom + 10) + 'px';
+        dropdown.style.right = (window.innerWidth - rect.right) + 'px';
+    }
+
+    // Handle window scroll to reposition dropdown
+    window.addEventListener('scroll', function() {
+        const dropdown = document.querySelector('.cart-dropdown');
+        if (dropdown && dropdown.classList.contains('active')) {
+            positionCartDropdown(dropdown);
+        }
+    });
+
+    // Handle window resize
+    window.addEventListener('resize', function() {
+        const dropdown = document.querySelector('.cart-dropdown');
+        if (dropdown && dropdown.classList.contains('active')) {
+            positionCartDropdown(dropdown);
+        }
+    });
 
     function updateCartDropdown() {
         const dropdown = document.querySelector('.cart-dropdown');

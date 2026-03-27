@@ -197,15 +197,13 @@ a:hover {
 
 /* ==================== CART DROPDOWN ==================== */
 .cart-dropdown {
-    position: absolute;
-    top: 100%;
-    right: 0;
+    position: fixed;
     width: 350px;
     max-height: 500px;
     background: white;
     border-radius: 8px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
+    z-index: 10000;
     opacity: 0;
     visibility: hidden;
     transform: translateY(-10px);
