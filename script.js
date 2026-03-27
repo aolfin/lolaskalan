@@ -390,3 +390,232 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+// ==================== SHOPPING CART FUNCTIONALITY ====================
+document.addEventListener('DOMContentLoaded', function() {
+    // Load cart from localStorage (persists across pages)
+    let cart = JSON.parse(localStorage.getItem('restaurantCart')) || [];
+
+    // DOM elements
+    const cartIcon = document.getElementById('cartIcon');
+    const cartCount = document.getElementById('cartCount');
+    const addToCartButtons = document.querySelectorAll('.add-to-cart');
+
+    // Initialize cart display
+    updateCartCount();
+
+    // Add to cart functionality
+    addToCartButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const itemName = this.getAttribute('data-name');
+            const itemPrice = parseFloat(this.getAttribute('data-price'));
+
+            addItemToCart(itemName, itemPrice);
+
+            // Visual feedback
+            this.textContent = 'Added!';
+            this.style.backgroundColor = '#28a745';
+            setTimeout(() => {
+                this.textContent = 'Add to Cart';
+                this.style.backgroundColor = '';
+            }, 1000);
+        });
+    });
+
+    // Cart icon click to show dropdown
+    if (cartIcon) {
+        cartIcon.addEventListener('click', toggleCartDropdown);
+    }
+
+    // Close cart when clicking outside
+    document.addEventListener('click', function(e) {
+        const cartDropdown = document.querySelector('.cart-dropdown');
+        if (cartDropdown && !cartIcon.contains(e.target) && !cartDropdown.contains(e.target)) {
+            cartDropdown.classList.remove('active');
+        }
+    });
+
+    function addItemToCart(name, price) {
+        // Check if item already exists
+        const existingItem = cart.find(item => item.name === name);
+
+        if (existingItem) {
+            existingItem.quantity += 1;
+        } else {
+            cart.push({
+                name: name,
+                price: price,
+                quantity: 1
+            });
+        }
+
+        saveCart();
+        updateCartCount();
+    }
+
+    function removeItemFromCart(name) {
+        cart = cart.filter(item => item.name !== name);
+        saveCart();
+        updateCartCount();
+        updateCartDropdown();
+    }
+
+    function updateItemQuantity(name, newQuantity) {
+        if (newQuantity <= 0) {
+            removeItemFromCart(name);
+            return;
+        }
+
+        const item = cart.find(item => item.name === name);
+        if (item) {
+            item.quantity = newQuantity;
+            saveCart();
+            updateCartCount();
+            updateCartDropdown();
+        }
+    }
+
+    function clearCart() {
+        cart = [];
+        saveCart();
+        updateCartCount();
+        updateCartDropdown();
+    }
+
+    function getCartTotal() {
+        return cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+    }
+
+    function saveCart() {
+        localStorage.setItem('restaurantCart', JSON.stringify(cart));
+    }
+
+    function updateCartCount() {
+        const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+        cartCount.textContent = totalItems;
+        cartCount.style.display = totalItems > 0 ? 'flex' : 'none';
+    }
+
+    function toggleCartDropdown() {
+        let dropdown = document.querySelector('.cart-dropdown');
+
+        if (!dropdown) {
+            dropdown = document.createElement('div');
+            dropdown.className = 'cart-dropdown';
+            cartIcon.appendChild(dropdown);
+        }
+
+        if (dropdown.classList.contains('active')) {
+            dropdown.classList.remove('active');
+        } else {
+            updateCartDropdown();
+            dropdown.classList.add('active');
+        }
+    }
+
+    function updateCartDropdown() {
+        const dropdown = document.querySelector('.cart-dropdown');
+        if (!dropdown) return;
+
+        const total = getCartTotal();
+
+        if (cart.length === 0) {
+            dropdown.innerHTML = `
+                <div class="cart-header">
+                    <h3>Your Cart</h3>
+                </div>
+                <div class="empty-cart">
+                    <i class="fas fa-shopping-cart"></i>
+                    <p>Your cart is empty</p>
+                    <p>Add some delicious Filipino dishes!</p>
+                </div>
+            `;
+        } else {
+            dropdown.innerHTML = `
+                <div class="cart-header">
+                    <h3>Your Cart</h3>
+                </div>
+                <div class="cart-items">
+                    ${cart.map(item => `
+                        <div class="cart-item">
+                            <div class="cart-item-info">
+                                <h4>${item.name}</h4>
+                                <p>$${item.price.toFixed(2)} × ${item.quantity} = $${(item.price * item.quantity).toFixed(2)}</p>
+                            </div>
+                            <div class="cart-item-controls">
+                                <div class="quantity-controls">
+                                    <button class="quantity-btn decrease" data-name="${item.name}">-</button>
+                                    <span class="quantity-display">${item.quantity}</span>
+                                    <button class="quantity-btn increase" data-name="${item.name}">+</button>
+                                </div>
+                                <button class="remove-item" data-name="${item.name}">×</button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="cart-total">
+                    <strong>Total: $${total.toFixed(2)}</strong>
+                </div>
+                <div class="cart-actions">
+                    <button class="clear-cart-btn">Clear Cart</button>
+                    <button class="checkout-btn">Checkout</button>
+                </div>
+            `;
+
+            // Add event listeners for the dropdown
+            const decreaseBtns = dropdown.querySelectorAll('.quantity-btn.decrease');
+            const increaseBtns = dropdown.querySelectorAll('.quantity-btn.increase');
+            const removeBtns = dropdown.querySelectorAll('.remove-item');
+            const clearBtn = dropdown.querySelector('.clear-cart-btn');
+            const checkoutBtn = dropdown.querySelector('.checkout-btn');
+
+            decreaseBtns.forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const name = this.getAttribute('data-name');
+                    const item = cart.find(item => item.name === name);
+                    if (item) {
+                        updateItemQuantity(name, item.quantity - 1);
+                    }
+                });
+            });
+
+            increaseBtns.forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const name = this.getAttribute('data-name');
+                    const item = cart.find(item => item.name === name);
+                    if (item) {
+                        updateItemQuantity(name, item.quantity + 1);
+                    }
+                });
+            });
+
+            removeBtns.forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const name = this.getAttribute('data-name');
+                    removeItemFromCart(name);
+                });
+            });
+
+            if (clearBtn) {
+                clearBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    if (confirm('Are you sure you want to clear your cart?')) {
+                        clearCart();
+                    }
+                });
+            }
+
+            if (checkoutBtn) {
+                checkoutBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    alert(`Thank you for your order!\n\nTotal: $${total.toFixed(2)}\n\nYour food will be ready soon!`);
+                    clearCart();
+                    dropdown.classList.remove('active');
+                });
+            }
+        }
+    }
+});
