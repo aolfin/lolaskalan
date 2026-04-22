@@ -199,6 +199,7 @@ a:hover {
 .cart-dropdown {
     position: fixed;
     width: 350px;
+    max-width: calc(100% - 20px);
     max-height: 500px;
     background: white;
     border-radius: 8px;
@@ -1298,6 +1299,15 @@ a:hover {
         color: var(--primary-color);
     }
 
+    .cart-dropdown {
+        width: calc(100% - 30px);
+        max-width: 340px;
+        left: 50% !important;
+        right: auto !important;
+        transform: translateX(-50%) !important;
+        max-height: calc(100vh - 140px);
+    }
+
     .item-desc::before {
         content: 'Description: ';
         font-weight: bold;
@@ -1328,5 +1338,15 @@ a:hover {
 
     .footer-section h4 {
         font-size: 1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .cart-dropdown {
+        width: calc(100% - 40px) !important;
+        max-width: 340px !important;
+        left: 50% !important;
+        right: auto !important;
+        transform: translateX(-50%) !important;
     }
 }

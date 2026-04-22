@@ -517,9 +517,27 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function positionCartDropdown(dropdown) {
         const rect = cartIcon.getBoundingClientRect();
+        const availableWidth = window.innerWidth - 20;
+        const dropdownWidth = Math.min(350, availableWidth);
+
         dropdown.style.position = 'fixed';
         dropdown.style.top = (rect.bottom + 10) + 'px';
-        dropdown.style.right = (window.innerWidth - rect.right) + 'px';
+        dropdown.style.width = dropdownWidth + 'px';
+        dropdown.style.maxWidth = 'calc(100% - 20px)';
+
+        if (window.innerWidth <= 768) {
+            dropdown.style.left = '50%';
+            dropdown.style.right = 'auto';
+            dropdown.style.transform = 'translateX(-50%)';
+            dropdown.style.width = 'calc(100% - 30px)';
+            dropdown.style.maxWidth = '340px';
+        } else {
+            dropdown.style.left = 'auto';
+            dropdown.style.right = (window.innerWidth - rect.right) + 'px';
+            dropdown.style.transform = '';
+            dropdown.style.width = dropdownWidth + 'px';
+            dropdown.style.maxWidth = 'calc(100% - 20px)';
+        }
     }
 
     // Handle window scroll to reposition dropdown
