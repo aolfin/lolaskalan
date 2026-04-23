@@ -162,7 +162,32 @@ function setActiveNavLink() {
 
 document.addEventListener('DOMContentLoaded', setActiveNavLink);
 
-// ==================== SCROLL ANIMATIONS ==================== 
+document.addEventListener('DOMContentLoaded', function() {
+    const aboutImages = [
+        {
+            key: 'story',
+            src: 'https://platform.ny.eater.com/wp-content/uploads/sites/6/chorus/uploads/chorus_asset/file/24568717/reneed2.jpeg?quality=90&strip=all&crop=0,0,100,100',
+            alt: 'Restaurant Interior'
+        },
+        {
+            key: 'mission',
+            src: 'https://s3-media0.fl.yelpcdn.com/bphoto/KPjG591qpTgy1rIFFaNkAQ/348s.jpg',
+            alt: 'Chef Preparing Food'
+        }
+    ];
+
+    aboutImages.forEach(item => {
+        const container = document.querySelector(`.about-image[data-image-key="${item.key}"]`);
+        if (container) {
+            const img = document.createElement('img');
+            img.src = item.src;
+            img.alt = item.alt;
+            container.appendChild(img);
+        }
+    });
+});
+
+// ==================== SCROLL ANIMATIONS ====================
 const observerOptions = {
     threshold: 0.1,
     rootMargin: '0px 0px -50px 0px'
@@ -451,6 +476,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
         saveCart();
         updateCartCount();
+        const dropdown = document.querySelector('.cart-dropdown');
+        if (dropdown && dropdown.classList.contains('active')) {
+            updateCartDropdown();
+        }
     }
 
     function removeItemFromCart(name) {

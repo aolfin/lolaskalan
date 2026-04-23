@@ -1,0 +1,8 @@
+node_modules
+.git
+.vscode
+*.log
+Dockerfile
+homework3/node_modules
+homework3/dist
+homework3/.git
